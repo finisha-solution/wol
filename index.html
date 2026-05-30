@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Word of Life | KJV Bible + Instant Reflections</title>
+  <meta name="description" content="Get a random KJV verse with explanation, story & lesson – or enter any Bible reference and let the Word come alive.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #faf7f0 0%, #ede3d3 100%);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Georgia', serif;
+      padding: 2rem 1.5rem;
+      color: #2c2418;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* glassmorphic header */
+    .banner {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .banner h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7a5b3a, #c2a15b);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+      text-shadow: 2px 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .banner p {
+      font-size: 1.2rem;
+      color: #5e4b32;
+      border-top: 2px solid #e2cfb5;
+      display: inline-block;
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    /* cards */
+    .card {
+      background: rgba(255, 254, 247, 0.96);
+      backdrop-filter: blur(0px);
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #efe1cf;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 25px 40px -14px rgba(0,0,0,0.25);
+    }
+
+    .verse-text {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 1.8rem;
+      line-height: 1.4;
+      color: #2a241c;
+      quotes: "“" "”" "‘" "’";
+      font-weight: 500;
+    }
+
+    .verse-text::before {
+      content: "“";
+      font-size: 2.2rem;
+      color: #b48c48;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .verse-text::after {
+      content: "”";
+      font-size: 2.2rem;
+      color: #b48c48;
+      font-weight: 600;
+      margin-left: 4px;
+      vertical-align: top;
+    }
+
+    .reference-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      background: #f3ecdf;
+      padding: 0.3rem 1.2rem;
+      border-radius: 60px;
+      color: #9b7b4c;
+    }
+
+    .section {
+      background: #fefaf3;
+      border-left: 5px solid #d4b483;
+      margin: 1.8rem 0;
+      padding: 1.2rem 1.5rem;
+      border-radius: 1.5rem;
+    }
+
+    .section h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #6b4e2a;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section p {
+      font-size: 1rem;
+      line-height: 1.55;
+      color: #2f2a23;
+    }
+
+    button, .btn {
+      background: #7c5f3a;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    button:hover, .btn:hover {
+      background: #9b784b;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -8px rgba(0,0,0,0.2);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      color: #5a3e22;
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      border-radius: 32px;
+      border: 1px solid #e2d4c2;
+      background: white;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #b48c48;
+      box-shadow: 0 0 0 3px rgba(180, 140, 72, 0.2);
+    }
+
+    .flex-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #b48c48;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .error-message {
+      background: #ffedea;
+      color: #b33;
+      padding: 0.8rem 1.2rem;
+      border-radius: 40px;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      border-left: 4px solid #b33;
+    }
+
+    .donation-badge {
+      background: linear-gradient(115deg, #1e3a1e, #2c5f2d);
+      border-radius: 80px;
+      padding: 1rem 2rem;
+      margin: 2rem 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: #f9efd9;
+    }
+
+    .mpesa-number {
+      background: #f9e0a0;
+      padding: 0.5rem 1.2rem;
+      border-radius: 60px;
+      font-weight: bold;
+      font-family: monospace;
+      color: #1e3a1e;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .copy-hint {
+      cursor: pointer;
+      background: #2c5f2d;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      color: white;
+    }
+
+    hr {
+      margin: 1rem 0;
+      border: none;
+      height: 2px;
+      background: #eedfcb;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #8f7c64;
+    }
+
+    .toggle-link {
+      color: #9b7b4c;
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-decoration: underline;
+      margin-left: 0.5rem;
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 1rem; }
+      .verse-text { font-size: 1.4rem; }
+      .card { padding: 1.3rem; }
+      button { width: 100%; justify-content: center; }
+      .donation-badge { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="banner">
+    <h1>📖 Word of Life</h1>
+    <p>KJV · Explanation · Life Story · Christian Lesson</p>
+  </div>
+
+  <!-- Random verse card (built-in 28) -->
+  <div class="card" id="randomVerseCard">
+    <div id="randomVerseContent">Loading...</div>
+  </div>
+  <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
+    <button id="refreshRandomBtn">🕊️ New Random Verse</button>
+  </div>
+
+  
+  <div class="card">
+    <h2 style="color:#7a5b3a; margin-bottom: 1rem;">✨ Add any Bible reference</h2>
+    <div class="input-group">
+      <label>📖 Enter reference (e.g., John 3:16, Psalm 23, Romans 8:28)</label>
+      <input type="text" id="bibleRefInput" placeholder="Example: Philippians 4:13">
+    </div>
+    <div class="flex-btns">
+      <button id="fetchVerseBtn">📜 Fetch & Generate</button>
+      <span class="toggle-link" id="showManualToggle">✍️ Or type verse manually</span>
+    </div>
+    <div id="manualVerseArea" style="display: none; margin-top: 1.5rem;">
+      <div class="input-group">
+        <label>✍️ Type the verse text (KJV preferred)</label>
+        <textarea id="manualVerseText" rows="3" placeholder="I can do all things through Christ which strengtheneth me."></textarea>
+      </div>
+      <button id="manualGenerateBtn">🕯️ Generate from typed verse</button>
+    </div>
+    <div id="fetchLoader" style="display: none; margin-top: 1rem;"><span class="loader"></span> Fetching Scripture...</div>
+    <div id="fetchError" class="error-message" style="display: none;"></div>
+  </div>
+
+  <!-- Result container for generated verse content -->
+  <div id="generatedResultContainer" style="display: none;">
+    <div class="card" id="generatedResultCard"></div>
+  </div>
+
+ 
+  <div class="donation-badge">
+    <span>🇰🇪 Support this platform – charity keeps the Word spreading</span>
+    <div class="mpesa-number">
+      📱 <span id="mpesaNumberDisplay"><strong><b> 0791793096</b></strong></span>
+      <span class="copy-hint" id="copyMpesaBtn">Copy</span>
+    </div>
+  </div>
+  <div class="footer">
+    “Thy word is a lamp unto my feet” — Psalm 119:105<br>
+    28 built‑in KJV verses + AI‑inspired reflections for any scripture
+  </div>
+</div>
+
+<script>
+  // ----------------------- 28 BUILT-IN VERSES (unchanged but compact) -----------------------
+  const bibleData = [
+  {
+    ref: "Psalm 23:1",
+    verse: "The LORD is my shepherd; I shall not want.",
+    explanation: "This verse paints God not as a distant ruler but as a personal Shepherd. In ancient Israel, sheep were completely dependent on the shepherd for food, water, safety, and direction. When David says 'I shall not want,' he means that with God as his shepherd, every true need – not every greedy desire – will be supplied. It’s a declaration of complete trust in God’s provision and protection.",
+    story: "Elena’s husband had died two years earlier, leaving her with three young children and a mountain of medical bills. One bitter December evening, after putting the kids to bed with nothing but bread and water for supper, she sank onto the kitchen floor and wept. 'Lord, I have no idea how we’ll survive the winter,' she whispered. The next morning, a knock came at the door. It was Mrs. Ogutu from church, holding two bags of groceries. 'I don’t know why, but I felt I should bring this today,' she said. That week, the church quietly paid her heating bill. A neighbour offered to watch the children so Elena could work part‑time at a local bakery. Month after month, exactly when a need arose, provision appeared – never luxurious, but always sufficient. Years later, Elena spoke to a women’s group: 'I learned that the Shepherd doesn’t promise a path without valleys, but He promises that we shall not lack. Every single time, He led me to still waters – even through the valley of the shadow of death.'",
+    lesson: "Trust God as your Shepherd; He knows your needs intimately. Practice gratitude even in scarcity, and watch how He provides – often through unexpected people and circumstances."
+  },
+  {
+    ref: "Jeremiah 29:11",
+    verse: "For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end.",
+    explanation: "God spoke these words to the Israelites in exile – they were captives in Babylon, far from home, seemingly abandoned. Yet God assures them that His plans are not for their destruction but for a hopeful future. 'Thoughts of peace' means plans for welfare, not calamity. 'An expected end' is a future with purpose. This verse is a powerful reminder that our present suffering is not the final word.",
+    story: "Marcus spent his twenties addicted to heroin. He stole from his own mother, slept in abandoned buildings, and overdosed twice. After his second arrest, a judge offered him a choice: prison or a long‑term faith‑based recovery program. Marcus chose the program, but with zero hope. The first month, he tried to run away three times. Then one evening, an old pastor named Samuel sat beside him and read Jeremiah 29:11. 'Marcus, God hasn’t given up on you,' Samuel said. 'He has a future for you, and it’s not this.' Those words cracked something open inside Marcus. He started attending every session, got his GED, and discovered a gift for speaking to other addicts. Today, Marcus directs a halfway house for men coming out of addiction. He has spoken to over 5,000 young people about the hope he found. 'I used to think my life was a write‑off,' he says. 'Now I see that every dark chapter was preparing me for this unexpected, beautiful ending.'",
+    lesson: "Your current chaos is not your final chapter. God weaves even painful failures into a hopeful future. Hold on and take one faithful step today."
+  },
+  {
+    ref: "Isaiah 40:31",
+    verse: "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.",
+    explanation: "Waiting on the Lord is not passive idleness; it is active trust and hopeful expectation. The Hebrew word 'qavah' means to look for, hope, or bind together. When we wait on God, we are tying our strength to His. The result is renewed energy – like an eagle soaring effortlessly on thermal updrafts, we rise above our circumstances without burning out.",
+    story: "After a devastating car accident, Lisa was bedridden for months. Even the simplest tasks exhausted her. She was a former marathon runner, and the loss of her mobility crushed her spirit. Every day she prayed for healing, but the recovery was painfully slow. One morning, she read Isaiah 40:31. She decided to 'wait' by spending her limited energy on prayer and scripture, not on worrying. She began to notice small improvements: she could sit up for an hour, then take a few steps. Instead of rushing back to running, she started a prayer group for people with chronic illnesses. Within two years, she was walking without pain – and leading a ministry that reached hundreds. 'God didn't just heal my body,' she says. 'He gave me wings to serve in a way I never could before.'",
+    lesson: "When you feel drained, don't push harder in your own power. Wait on the Lord through prayer and rest. He will renew your strength and lift you higher than you could ever go alone."
+  },
+  {
+    ref: "Philippians 4:13",
+    verse: "I can do all things through Christ which strengtheneth me.",
+    explanation: "This verse is often quoted as a success mantra, but its original context is about contentment in hardship. Paul wrote from prison, having faced hunger, poverty, and persecution. 'All things' means enduring both abundance and need, both joy and suffering – not achieving every personal ambition. The strength comes from Christ’s indwelling power, not from human willpower.",
+    story: "Daniel was a shy, stuttering young man who felt called to preach. His first attempt to share a testimony in front of 20 people ended in tears – he froze, then ran out. He almost gave up. But a mentor challenged him: 'Paul said he could do all things through Christ, not through eloquence.' Daniel began to pray before every speaking opportunity, not for fluency but for courage. Slowly, he learned to speak slowly, pausing to breathe. He discovered that his vulnerability made him relatable. Today, Daniel is a prison chaplain, speaking to hundreds of inmates at a time. 'I still stutter sometimes,' he admits, 'but now I know it’s not my strength – it’s Christ in me that reaches them.'",
+    lesson: "When facing something beyond your ability, remember that Christ’s strength is made perfect in your weakness. Step out in faith, not in your own power."
+  },
+  {
+    ref: "Romans 8:28",
+    verse: "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.",
+    explanation: "This is not a promise that everything will feel good, but that God weaves even evil, tragedy, and human failure into a greater good for His children. The key phrase is 'for good' – not necessarily comfort, but conformity to Christ’s image and ultimate redemption. It requires love for God and a life lived according to His purpose.",
+    story: "Chloe was 16 when her father died of cancer. She watched him waste away over 18 months. The grief turned to bitter anger – at God, at doctors, at life. She stopped going to church. Her grades plummeted. One night, she found her father’s old Bible open to Romans 8:28, underlined in red. She screamed at God, 'How can this be good?!' But she kept reading the rest of the chapter – about suffering producing glory. Over the next year, she slowly began to attend a grief support group. There she met other teens who had lost parents. She started sharing her story, and eventually, she founded a local 'Hope for the Hurting' group for young people. Today, she is a counsellor specialising in childhood grief. 'I still miss my dad every day,' she says, 'but I see how God used that valley to give me a ministry I would never have chosen on my own.'",
+    lesson: "You don’t have to understand every trial today. Trust that the Master Artist can use every dark stroke to create a masterpiece of grace in your life."
+  },
+  {
+    ref: "Proverbs 3:5-6",
+    verse: "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.",
+    explanation: "Human understanding is limited by our perspective; we see only a fragment of reality. Trusting God means surrendering the need to figure everything out. 'Leaning' implies putting our weight on something – don’t put your full weight on your own reasoning. Acknowledging God means inviting Him into every decision, large or small.",
+    story: "James had a comfortable job as an accountant, but he felt a persistent pull to start a Christian media outreach for young people. His logical mind screamed 'Stay safe – you have a mortgage and two kids.' He wrestled for months. One night, he wrote down all the reasons to stay (security, salary) and all the reasons to go (passion, calling). Human understanding said 'stay.' But he knelt and said, 'Lord, I don’t understand, but I trust You.' He quit his job with no backup plan. The first year was terrifying – he barely made ends meet. But then a local church offered him free studio space. A donor gave a small grant. Within five years, his YouTube channel reached 200,000 subscribers. 'Looking back,' James says, 'God directed every step, even the ones that looked like detours.'",
+    lesson: "Stop overanalysing every decision. Pray, then move. When you commit your plans to God, He will align circumstances and open doors you couldn’t force open."
+  },
+  {
+    ref: "Joshua 1:9",
+    verse: "Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.",
+    explanation: "This command came to Joshua as he faced the impossible task of leading Israel into the Promised Land. Fear and dismay are natural human reactions to overwhelming challenges. God’s antidote is not the removal of the obstacle but the promise of His presence. 'Be strong and courageous' is repeated three times in this chapter – it’s a divine imperative rooted in God’s companionship.",
+    story: "Rosa was a single mother who fled violence in her home country and arrived in a new nation with only a suitcase and a one‑year‑old daughter. She didn’t speak the language. She had no family, no job, no home. The first night in a shelter, she cried until she had no tears left. Then she remembered a verse her grandmother taught her: 'Be strong and courageous, for the Lord your God is with you wherever you go.' She whispered it like a lifeline. The next day, she found a church that helped her with English classes. A member offered her a small apartment rent‑free for six months. Rosa worked two cleaning jobs, learned English, and eventually became a nurse. She now volunteers at the same shelter where she once slept. 'I was so afraid,' she says, 'but God never left me. Not once.'",
+    lesson: "Fear loses its grip when you focus on God’s promised presence. Face that difficult conversation, new job, or lonely season – you never walk alone."
+  },
+  {
+    ref: "Matthew 11:28-30",
+    verse: "Come unto me, all ye that labour and are heavy laden, and I will give you rest. Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls.",
+    explanation: "Jesus invites the exhausted, the burnt‑out, the overwhelmed. A yoke was a wooden frame used to pair two oxen for ploughing. Sharing Jesus’ yoke means walking in step with Him – He takes the heavy end, and His burden is light because He is gentle and humble. Soul‑rest is not just physical sleep but deep inner peace.",
+    story: "Carlos was a high‑achieving executive who worked 70‑hour weeks, managed a team of 50, and was always on call. He hadn’t taken a real vacation in six years. His marriage was crumbling, and he had severe chest pains from stress. One Sunday, his wife dragged him to a small church. The pastor read Matthew 11:28 and said, 'Jesus isn’t impressed by your hustle – He’s inviting you to rest.' Carlos broke down. He realised he had been carrying burdens Jesus never asked him to bear. He started by taking every Sunday off – no email, no work calls. He joined a small group and learned to pray. Within a year, he had stepped down from his role and started a consulting business with saner hours. 'I thought rest was laziness,' he says. 'Now I know it’s obedience. My soul finally has room to breathe.'",
+    lesson: "Rest is not laziness – it’s obedience. Give your heavy burdens to Christ daily. Learn His gentle rhythm of grace."
+  },
+  {
+    ref: "Psalm 46:1",
+    verse: "God is our refuge and strength, a very present help in trouble.",
+    explanation: "The word 'refuge' conjures an image of a fortress, a high tower where enemies cannot reach. But God is not a distant stronghold – He is a 'very present help,' meaning immediately available in the moment of trouble. This verse was written during a time of national crisis (Psalm 46 describes earthquakes, floods, and war). The point is not that trouble won’t come, but that God is an ever‑present shelter within it.",
+    story: "When Samuel’s village was hit by a flash flood, he lost everything – his home, his small grocery shop, and his brother, who drowned trying to save their stock. For weeks, Samuel lived in a tent, numb with grief. The disaster relief teams came and went, but the trauma remained. One night, he opened a tattered Bible and read Psalm 46:1. 'God, be my refuge,' he prayed, not knowing what that meant. The next morning, a church from three towns away arrived with building materials. They didn’t just rebuild his house – they stayed for two months, working alongside the villagers. Samuel ended up leading a community rebuilding team. Today, he runs a disaster preparedness program for rural villages. 'The flood took everything,' he says, 'but it taught me that God is not a distant helper – He shows up in the mud and the rubble.'",
+    lesson: "You don’t need to be strong enough on your own. Run to God first – He is your immediate help and safe place, even in the middle of the storm."
+  },
+  {
+    ref: "Psalm 119:105",
+    verse: "Thy word is a lamp unto my feet, and a light unto my path.",
+    explanation: "In the ancient world, a lamp was a small oil lamp that illuminated only a few steps ahead – not the entire journey. Scripture does not usually show us the whole future, but it gives enough light for the next step. This is a promise of guidance for daily decisions, not a roadmap for ten years from now.",
+    story: "Nadia dropped out of university after her parents divorced. She felt lost, depressed, and directionless. She took a dead‑end job in a call centre, and her days blurred together. A coworker invited her to a Bible study. Reluctantly, she went. They were studying Psalm 119. When they read verse 105, the leader said, 'God’s Word doesn’t give you a floodlight – it gives you a lamp. Enough to see where to put your next foot.' Nadia started reading one Proverb every morning. The first few weeks, she felt nothing. But slowly, the wisdom shaped her small choices: she stopped hanging out with toxic friends, she started saving a little money, she applied for an online course in graphic design. One step at a time, a new path emerged. Two years later, she landed a job as a junior designer. 'I never saw the whole staircase,' she says, 'but God’s Word showed me each step, and that was enough.'",
+    lesson: "Read the Bible daily, even if just a few verses. It will illuminate your path one step at a time, guiding your small choices that lead to big changes."
+  },
+  {
+    ref: "Ephesians 2:8-9",
+    verse: "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast.",
+    explanation: "Salvation is entirely a gift, not a wage for good behaviour. 'Grace' means unmerited favour – getting what we don’t deserve. 'Faith' is the hand that receives the gift. The phrase 'not of yourselves' strips away any human pride. If salvation could be earned, we would boast; but since it’s a gift, all glory goes to God.",
+    story: "Eduardo grew up in a legalistic church where salvation seemed to depend on endless rules: don’t miss a Sunday, tithe exactly, never doubt, and maybe – just maybe – you’d make it. He was exhausted. He prayed, fasted, and served, but he never felt sure. One night at a retreat, the speaker read Ephesians 2:8-9 and said, 'God is not impressed by your performance. He’s offering you a free gift. You just have to stop trying and receive.' Eduardo broke down. He realised he had been trying to earn something that was already given. That night, he prayed a simple prayer: 'Lord, I give up. I receive your grace.' For the first time, peace flooded his heart. He still serves and gives, but now out of gratitude, not fear.",
+    lesson: "Stop striving to earn God’s love. Receive His grace like a gift. Your identity is not in your works, but in Christ’s finished work."
+  },
+  {
+    ref: "2 Corinthians 5:7",
+    verse: "For we walk by faith, not by sight.",
+    explanation: "Walking by sight means relying on what we can see, measure, or prove. Walking by faith means trusting God’s promises even when circumstances contradict them. It’s not blind optimism; it’s confidence in the character of God based on His past faithfulness. This verse is the practical outworking of Hebrews 11:1 – faith is the substance of things hoped for.",
+    story: "Leah’s organic skincare business collapsed during an economic downturn. She lost her inventory, her lease, and most of her savings. Her accountant advised bankruptcy. Human sight said it was over. But one morning, she felt God whisper, 'Start a prayer journal and write down one small step each day.' She began writing: 'Today I will call three suppliers to negotiate.' Some said no; one said maybe. Another step: 'I will offer free online workshops to build audience.' Only five people attended the first one, but one of them was a distributor who later placed a huge order. Step by small step, without seeing the full picture, Leah rebuilt – not the same business, but a more resilient, faith‑based brand. 'If I had looked at the facts alone, I would have quit,' she says. 'But faith made me walk even when the road was invisible.'",
+    lesson: "When you can’t see the outcome, keep moving in obedience. Faith is the bridge between God’s promise and its fulfilment."
+  },
+  {
+    ref: "1 John 4:18",
+    verse: "There is no fear in love; but perfect love casteth out fear: because fear hath torment. He that feareth is not made perfect in love.",
+    explanation: "Fear and love are opposites. Perfect love – the complete, unconditional love of God – expels fear the way light expels darkness. Fear torments, creating anxiety and paralysis. When we fully grasp how much God loves us (demonstrated at the cross), we no longer fear punishment, rejection, or failure. This doesn’t mean we never feel afraid, but that fear no longer rules us.",
+    story: "Miriam was terrified of rejection. She had been abandoned by her father as a child, and that wound followed her into adulthood. She avoided close friendships, never shared her true feelings, and turned down a marriage proposal because she was sure the man would eventually leave her. At a women’s retreat, the speaker asked everyone to write down their deepest fear. Miriam wrote, 'I am afraid that if people really knew me, they would reject me.' Then the speaker read 1 John 4:18. 'God’s love is not like human love,' she said. 'It’s perfect – it never leaves, never betrays, never rejects.' Miriam began to pray every morning: 'Lord, show me Your perfect love today.' Over time, she took small risks: she shared a struggle in a small group, and the group embraced her. She eventually married a patient, loving man. 'I still feel fear sometimes,' she admits, 'but it doesn’t run my life anymore. God’s love cast it out.'",
+    lesson: "Let God’s love heal your fears. You are fully accepted in Christ – you don’t have to be perfect to be loved."
+  },
+  {
+    ref: "Romans 12:2",
+    verse: "And be not conformed to this world: but be ye transformed by the renewing of your mind, that ye may prove what is that good, and acceptable, and perfect, will of God.",
+    explanation: "The world pressures us to fit into its mold – materialism, selfish ambition, anxiety. Transformation begins not with behaviour modification but with a renewed mind. As we change what we think, our desires and actions follow. The result is the ability to discern God’s will – not as a mysterious riddle, but as a natural outworking of a changed perspective.",
+    story: "Trent was addicted to consumerism. He bought the latest gadgets, wore designer clothes, and constantly compared himself to influencers on social media. His credit card debt was staggering. He knew he was unhappy, but he couldn’t stop. Then he started reading a Christian book on simplicity and memorising Romans 12:2. He began to question the messages he had absorbed: 'Do I really need this? Whose approval am I seeking?' He uninstalled social media apps, sold his expensive watch, and started giving 10% of his income to a local food bank. The change was gradual but real. Within a year, his debt was gone, and he found joy in experiences rather than things. 'I used to think the world’s way was the only way,' he says. 'But renewing my mind showed me a better path – and it’s the path of true freedom.'",
+    lesson: "Feed your mind with God’s truth. Over time, your desires will align with His will – and you will experience true transformation."
+  },
+  {
+    ref: "James 1:2-4",
+    verse: "My brethren, count it all joy when ye fall into divers temptations; Knowing this, that the trying of your faith worketh patience. But let patience have her perfect work, that ye may be perfect and entire, wanting nothing.",
+    explanation: "This is one of the most counter‑cultural commands in Scripture. 'Joy' in trials is not fake happiness but a deep confidence that God is using the difficulty to produce patience (steadfastness, endurance). Patience, when fully developed, leads to maturity – lacking nothing. Trials are not punishments; they are training grounds for character.",
+    story: "Andre lost his job as a warehouse manager when the company closed overnight. He was 48 years old, with a family to support and few other skills. The first three months were a blur of rejection letters and arguments with his wife. He felt angry, ashamed, and useless. Then a friend challenged him with James 1:2-4. 'Count it all joy? Are you serious?' Andre shouted. But he started to pray differently: 'God, instead of asking why, teach me what You want me to learn.' He enrolled in free online courses in supply chain management. He volunteered at a church food bank, learning humility and patience. After 18 months, he landed a better job than before – with a higher salary and a leadership role. 'The waiting was excruciating,' he says, 'but it forced me to grow. I’m a different man now – more patient, more empathetic, more complete.'",
+    lesson: "Don’t waste your trials. Let them grow your patience and character. God is preparing you for greater things."
+  },
+  {
+    ref: "Colossians 3:23",
+    verse: "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
+    explanation: "This verse transforms mundane work into sacred worship. 'Heartily' means from the soul, with full effort. When we work for human approval, we burn out; when we work for the Lord, even cleaning toilets becomes an act of worship. This includes not just paid jobs but all of life: parenting, studying, volunteering, cooking.",
+    story: "Ruth cleaned offices for a living – emptying trash bins, scrubbing bathrooms, vacuuming carpets after everyone had gone home. She felt invisible. Her coworkers complained constantly; her family made fun of her job. One day, she read Colossians 3:23. 'What if I did this as if Jesus were the one walking into the office tomorrow?' She started praying for each desk she cleaned. She left little notes of encouragement on sticky pads: 'God bless your day.' Her attitude changed. She hummed hymns while mopping. The office workers began to notice – some asked why she was always smiling. She shared her faith. Within two years, three of her colleagues came to Christ, and the office manager asked her to lead a weekly prayer group. 'I still clean toilets,' Ruth laughs, 'but now I do it for an audience of One, and it’s the most meaningful work I’ve ever done.'",
+    lesson: "Whatever your job – paid or unpaid – do it with wholehearted devotion to God. You are serving the King of Kings."
+  },
+  {
+    ref: "Hebrews 11:1",
+    verse: "Now faith is the substance of things hoped for, the evidence of things not seen.",
+    explanation: "Faith is not wishful thinking; it is the 'substance' – the real, solid reality – of what we hope for. It provides 'evidence' for things not yet visible, like a title deed to a future inheritance. Faith gives present reality to God’s future promises.",
+    story: "Philip’s son was diagnosed with a rare autoimmune disease. The doctors gave him a 20% chance of survival. Philip was a practical man – a civil engineer – who dealt in facts and data. He could not deny the medical evidence. But he also believed in a God who heals. He wrestled in prayer. One night, he wrote down every promise from Scripture about healing and put them on his refrigerator. Every time fear crept in, he read them aloud. He continued with the treatments, but he also asked his church to pray. Month after month, the boy’s numbers improved. After two years, the disease went into complete remission. The doctors called it a medical anomaly. Philip calls it 'the substance of things hoped for.' 'I couldn’t see the healing,' he says, 'but faith was my title deed. It kept me hoping until the evidence arrived.'",
+    lesson: "Act on what God has promised, even before you see it. Faith is your title deed for miracles."
+  },
+  {
+    ref: "Psalm 34:18",
+    verse: "The LORD is nigh unto them that are of a broken heart; and saveth such as be of a contrite spirit.",
+    explanation: "God does not run away from our pain; He runs toward it. 'Broken heart' and 'contrite spirit' describe someone crushed by life or by their own sin. In those moments, God is not distant – He is near. The word 'saveth' implies rescue, comfort, and restoration. This verse is a lifeline for the shattered.",
+    story: "After 15 years of marriage, Maria discovered her husband was having an affair. The divorce that followed was brutal. She lost her home, half of her friends, and any sense of self‑worth. She spent six months in a dark depression, barely able to get out of bed. One night, she opened a Bible to Psalm 34:18. 'Lord, I’m broken,' she whispered. 'If You’re near, show me.' The next day, a neighbour knocked on her door with a casserole and an invitation to a divorce recovery group. Maria went reluctantly. There, she found other women who had been shattered. They didn’t offer easy answers – they just sat with her in her pain. Over time, she began to heal. Today, Maria facilitates that same recovery group, helping other women find God in the rubble. 'I thought God had abandoned me,' she says. 'But He was closer than my own breath – He just showed up through broken people.'",
+    lesson: "Don’t hide your brokenness. Bring it to God. He is not afraid of your tears; He is near the brokenhearted."
+  },
+  {
+    ref: "1 Peter 5:7",
+    verse: "Casting all your care upon him; for he careth for you.",
+    explanation: "The verb 'casting' means to throw or hurl – an active, forceful action. It’s not a gentle placing. We are to throw all our anxieties (worries, fears, burdens) onto God. The reason is simple: He cares for you. Not a distant, theoretical care, but a personal, attentive love.",
+    story: "Sofia was a chronic worrier. She worried about money, her children’s safety, her health, the future – everything. She barely slept. One Sunday, her pastor preached on 1 Peter 5:7. He handed out small wooden boxes and said, 'Write your biggest worry on a slip of paper, put it in the box, and give the box to God.' Sofia took hers home and wrote, 'I worry that we will never get out of debt.' The next morning, she felt an urge to pray the verse out loud: 'I cast this worry on You, Lord, because You care for me.' She repeated it every time anxiety rose. Weeks passed. Nothing changed in her bank account, but something changed in her heart – the knot in her stomach loosened. Eventually, she found a financial counsellor and a part‑time job. The debt began to shrink. 'The worries still come,' she admits, 'but now I have a reflex – I throw them back to God. He’s big enough to carry them.'",
+    lesson: "Practice the discipline of casting. When a worry arises, verbally give it to God. He is strong enough to carry it."
+  },
+  {
+    ref: "Galatians 5:22-23",
+    verse: "But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, Meekness, temperance: against such there is no law.",
+    explanation: "These qualities are not produced by self‑effort; they are the natural result of the Holy Spirit’s indwelling. Notice it’s 'fruit' (singular), not 'fruits' – a single harvest that manifests in nine characteristics. They are the evidence of a life surrendered to God, not a checklist to achieve.",
+    story: "Bianca had a terrible temper. She yelled at her children, snapped at her husband, and cursed in traffic. She tried every self‑help book, but nothing worked. At church, a friend said, 'You can’t manufacture fruit – you have to abide in the vine.' Bianca started each morning by praying, 'Holy Spirit, fill me. Produce Your fruit in me today.' She kept a journal of her outbursts. Slowly, she noticed longer gaps between anger episodes. One day, her son spilled juice on her new laptop. Old Bianca would have screamed. New Bianca took a deep breath, said, 'It’s okay, accidents happen,' and helped him clean it. Her son stared in disbelief. 'Mom, you didn’t yell!' That moment convinced her: it wasn’t her effort – it was the Spirit’s work. 'I still have bad days,' she says, 'but the fruit is growing, one gentle response at a time.'",
+    lesson: "Don’t try to manufacture fruit. Abide in Christ, and the Spirit will produce these beautiful traits naturally."
+  },
+  {
+    ref: "Isaiah 41:10",
+    verse: "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.",
+    explanation: "God gives a three‑fold promise: strengthening, helping, and upholding. The 'right hand' symbolises power, authority, and favour. This is not a vague reassurance – it’s a covenant guarantee. The command 'fear not' is grounded in God’s character and presence.",
+    story: "Caleb was a father of three when he was diagnosed with stage‑3 colon cancer. The news hit him like a freight train. He couldn’t eat, couldn’t sleep, couldn’t think of anything but death. A friend gave him a card with Isaiah 41:10 on it. He taped it to his bathroom mirror. Every morning, he read it aloud: 'Fear not... I am with you... I will strengthen you... I will help you... I will uphold you.' During chemotherapy, when his body felt like it was failing, he whispered those words. The treatments were brutal, but he never missed a chemo session. After 18 months, the scans showed no evidence of disease. The doctors called it a 'remarkable response.' Caleb calls it 'the right hand of God.' 'I was terrified,' he says, 'but God’s promise became my anchor. He didn’t just say don’t fear – He held my hand through the darkest valley.'",
+    lesson: "Memorise this verse for your own battles. God doesn’t just say 'don’t fear' – He gives you His strong hand to hold."
+  },
+  {
+    ref: "Matthew 6:33",
+    verse: "But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.",
+    explanation: "The context is worry about material needs: food, clothing, shelter. Jesus says that instead of chasing these things, we should prioritise God’s reign (His rule in our lives) and His righteousness (living according to His standards). When we do that, God promises to provide the necessities – not necessarily luxuries, but what we truly need.",
+    story: "Lucas was a workaholic entrepreneur. He built a successful logistics company from scratch, but his marriage was crumbling, and he hadn’t spent quality time with his children in years. He was diagnosed with stress‑induced hypertension. His pastor challenged him: 'You are seeking profit first, and everything else is falling apart. Try seeking God first.' Lucas was sceptical, but he agreed to a radical experiment: no work on Sundays, daily morning prayer, and weekly family dinner. The first few weeks, he was anxious about lost revenue. But something strange happened – his business didn’t collapse. In fact, his managers rose to the occasion, and his health improved. Within a year, his relationships healed, and his company actually grew because he was more focused and less stressed. 'I thought putting God first would ruin my business,' he says. 'It saved it – and my family.'",
+    lesson: "Put God first in your time, money, and energy. Everything else falls into its proper place."
+  },
+  {
+    ref: "Romans 8:1",
+    verse: "There is therefore now no condemnation to them which are in Christ Jesus, who walk not after the flesh, but after the Spirit.",
+    explanation: "This is a declaration of freedom. For those who are in Christ (through faith), the verdict is 'not guilty.' The law’s condemnation has been removed. This doesn’t mean we never sin, but that sin no longer defines us. The phrase 'walk after the Spirit' describes the new direction of our lives – not perfection, but orientation.",
+    story: "Vanessa had an abortion when she was 19. For 15 years, she carried deep shame. She believed God could never love her. She stopped going to church, avoided Christian friends, and even struggled to pray. One day, a new neighbour invited her to a small group. The topic was Romans 8. When they read verse 1, Vanessa burst into tears. 'I feel condemned every single day,' she confessed. The group leader gently said, 'Feelings are not facts. The fact is that for those in Christ, there is no condemnation – zero, none. It’s finished.' Vanessa began to study the passage, repeating 'no condemnation' every morning. Over time, the shame lost its power. She eventually started a post‑abortion healing ministry, helping other women find the same freedom. 'The enemy whispered “guilty” for years,' she says. 'But God shouted “no condemnation” louder.'",
+    lesson: "The enemy whispers 'guilty' – but God declares 'no condemnation.' Receive your freedom today."
+  },
+  {
+    ref: "Psalm 37:4",
+    verse: "Delight thyself also in the LORD: and he shall give thee the desires of thine heart.",
+    explanation: "This is often misread as a blank cheque: 'If I’m happy enough, God will give me whatever I want.' But the key is 'delight yourself in the Lord' – when we find our joy in God Himself, He reshapes our desires to align with His will. Then He grants them, because they are now what He wants for us.",
+    story: "Ethan dreamed of being a famous rock musician. He wanted stadium tours, magazine covers, and millions of fans. He was talented, but his ego was huge. Then he attended a worship conference and encountered God’s presence in a new way. He began to delight not in his own fame but in God’s glory. Slowly, his desire changed: he still wanted to make music, but now he wanted to write songs that would lead people to Jesus. He joined a small worship team at his church. Within a few years, his original songs were being sung by thousands – not in stadiums, but in local congregations. He never became famous, but he found a deeper joy than he ever imagined. 'I got what I really wanted,' he says, 'not what I thought I wanted. God gave me the desire of my heart because He first gave me a new heart.'",
+    lesson: "Find your delight in God’s presence, not in getting things from Him. Your deepest desires will be transformed and fulfilled."
+  },
+  {
+    ref: "2 Timothy 1:7",
+    verse: "For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.",
+    explanation: "Fear is not from God – it is a tool of the enemy. God gives three gifts instead: power (divine enablement), love (affection that casts out fear), and a sound mind (self‑control, discipline, a healthy mental state). This verse is a weapon against anxiety and timidity.",
+    story: "Pastor David suffered from debilitating panic attacks before preaching. He would hyperventilate, feel dizzy, and sometimes cancel services. He felt like a failure. A mentor gave him 2 Timothy 1:7 and said, 'David, fear is not your portion – preach this verse over yourself.' David began to declare every morning: 'I do not have a spirit of fear – I have power, love, and a sound mind.' He also saw a counsellor and learned breathing techniques. The first time he preached after this, he still felt shaky, but he pushed through. Over time, the attacks diminished. Today, he helps other pastors with anxiety. 'I used to think God was punishing me with fear,' he says. 'Now I know that fear is an invader, not an inheritance. I’ve taken back my sound mind.'",
+    lesson: "Fear is a liar. Declare God’s gift of power, love, and sound mind over your life every morning."
+  },
+  {
+    ref: "John 14:27",
+    verse: "Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.",
+    explanation: "Jesus distinguishes His peace from worldly peace. The world’s peace depends on circumstances – no conflict, no problems. Jesus’ peace exists even in the middle of storms because it is rooted in His presence and His victory. He leaves it as an inheritance, and He commands us not to let our hearts be troubled.",
+    story: "Grace’s husband lost his business during an economic crash. Their savings were wiped out, and they faced foreclosure. Grace was a natural worrier, but she clung to John 14:27. She remembers praying, 'Lord, I don’t have peace in my circumstances, but I claim Your peace in my heart.' She started a gratitude journal, writing three things each day that were still good: her children’s laughter, a warm meal, a neighbour’s help. Odd jobs came – tutoring, babysitting, cleaning houses. They didn’t get rich, but they didn’t lose their home. Years later, Grace says, 'I learned that Jesus’ peace is not a feeling; it’s a person. And He never left us.'",
+    lesson: "You can have peace even when life is chaotic. Receive Christ’s gift – it’s not based on your situation."
+  },
+  {
+    ref: "Ephesians 4:32",
+    verse: "And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you.",
+    explanation: "This is the blueprint for Christian community: kindness, tenderheartedness (compassion), and forgiveness. The standard is God’s own forgiveness of us – infinite, undeserved, complete. We forgive not because the offender deserves it, but because we have been forgiven a much greater debt.",
+    story: "Victor’s older brother, Paul, stole their mother’s inheritance after she died. Paul forged documents, emptied accounts, and left Victor with nothing. Victor was livid; he consulted lawyers, prepared to sue, and cut off all contact. But the legal battle would have cost more than the inheritance. A friend gave him Ephesians 4:32. Victor scoffed: 'Forgive him? He stole from me!' But the verse kept returning. After six months of bitterness, Victor wrote Paul a letter: 'I still think what you did was wrong. But I’m choosing to forgive you, not because you deserve it, but because Christ forgave me.' Paul never apologised, but Victor felt the chains of resentment break. A year later, Paul got sick. Victor visited him in the hospital and paid for his treatment. 'I didn’t do it for him,' Victor says. 'I did it because unforgiveness was killing me. Now I’m free.'",
+    lesson: "Unforgiveness is a prison. Forgive because you are forgiven. Release the offence to God and walk in kindness."
+  },
+  {
+    ref: "Psalm 27:1",
+    verse: "The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?",
+    explanation: "Light exposes danger, salvation rescues from it, and strength enables us to stand. With God as all three, fear becomes irrational. The rhetorical questions 'whom shall I fear?' and 'of whom shall I be afraid?' are declarations of confidence, not the absence of threats.",
+    story: "Hannah was a police officer in a high‑crime district. She faced danger daily – armed suspects, domestic violence calls, dark alleys. She didn’t think she was afraid until she froze during a shooting and could not draw her weapon. The department sent her for counselling. She was diagnosed with PTSD. Her chaplain gave her Psalm 27:1. Hannah started reciting it every morning before her shift: 'The Lord is my light – He shows me what I need to see. The Lord is my salvation – He will bring me through. The Lord is the strength of my life – I don’t have to be strong alone.' Slowly, her confidence returned. One night, she talked down an armed man without firing a shot. Her colleagues asked how she stayed calm. 'I wasn’t calm,' she said. 'But I wasn’t afraid of being afraid, because God was with me.'",
+    lesson: "Identify what makes you afraid, then speak this verse over that fear. God is bigger than any threat."
+  }
+];
+  // ----------------------- GENERATION ENGINE (theme-based, robust) -----------------------
+  function generateFromVerse(reference, verseText) {
+    const lower = verseText.toLowerCase();
+    let theme = "general";
+    if (lower.includes("love")) theme = "love";
+    else if (lower.includes("fear") || lower.includes("afraid")) theme = "fear";
+    else if (lower.includes("peace")) theme = "peace";
+    else if (lower.includes("joy")) theme = "joy";
+    else if (lower.includes("strength") || lower.includes("power")) theme = "strength";
+    else if (lower.includes("grace")) theme = "grace";
+    else if (lower.includes("hope")) theme = "hope";
+    else if (lower.includes("faith")) theme = "faith";
+    else if (lower.includes("forgive")) theme = "forgiveness";
+    else if (lower.includes("wisdom")) theme = "wisdom";
+    else theme = "general";
+
+    const names = ["Samuel", "Grace", "David", "Naomi", "Peter", "Lydia", "Thomas", "Ruth", "Isaac", "Hannah", "Esther", "Levi"];
+    const name = names[Math.floor(Math.random() * names.length)];
+    const situations = ["a difficult season", "an unexpected crisis", "a moment of doubt", "a family trial", "a health battle"];
+
+    let explanation = "", story = "", lesson = "";
+    if (theme === "love") {
+      explanation = "This verse unveils God's unconditional love – a love that never fails, drives out fear, and transforms the coldest heart.";
+      story = `${name} felt rejected after a painful breakup. Meditating on this verse opened their eyes to God's relentless affection. They began to show genuine love to strangers, and their own wounds healed.`;
+      lesson = "You are infinitely loved by God. Let that love overflow to those who hurt you.";
+    } else if (theme === "fear") {
+      explanation = "God directly addresses human fear. He doesn't just say 'don't be afraid' – He gives His presence and promises as the antidote.";
+      story = `${name} faced a life‑threatening diagnosis. Each night they recited this verse, and supernatural courage replaced panic. They became a beacon of hope in the hospital.`;
+      lesson = "Fear is a liar. Speak this verse aloud and trust God's character over your circumstances.";
+    } else if (theme === "peace") {
+      explanation = "True peace is not the absence of trouble but the presence of God. This peace guards hearts and minds beyond human logic.";
+      story = `During a financial collapse, ${name} clung to this promise. Instead of worrying, they prayed and served others; peace became their anchor.`;
+      lesson = "Let God's peace rule your heart – it's a gift, not a reward for good behavior.";
+    } else if (theme === "joy") {
+      explanation = "Joy is deeper than happiness; it's a fruit of the Spirit that remains even in trials.";
+      story = `${name} lost a job but chose joy. They volunteered at a shelter and discovered purpose. Their radiant joy attracted others to Christ.`;
+      lesson = "Count small blessings daily – joy becomes your strength.";
+    } else if (theme === "strength") {
+      explanation = "God's strength shines in human weakness. We don't need to be self‑sufficient; His power works through us.";
+      story = `${name} battled chronic fatigue but leaned on this verse, starting an online ministry that reached thousands.`;
+      lesson = "Admit your weakness and watch God's power manifest.";
+    } else if (theme === "grace") {
+      explanation = "Grace is unearned favor – it saves, sustains, and transforms. Stop performing and start resting.";
+      story = `${name} spent years trying to earn God's approval. When grace clicked, they broke free from guilt and started a recovery group.`;
+      lesson = "You cannot out‑sin God's grace. Receive it daily and extend it freely.";
+    } else if (theme === "hope") {
+      explanation = "Hope is confident expectation that God will fulfill His promises, even when everything looks dark.";
+      story = `After a miscarriage, ${name} felt hopeless. This scripture became an anchor; she now leads a hope ministry for grieving mothers.`;
+      lesson = "Anchor your soul in God's promises – hope does not disappoint.";
+    } else if (theme === "faith") {
+      explanation = "Faith is the bridge between God's promises and our reality. It pleases God and moves mountains.";
+      story = `${name} stepped out to start a Christian business with little money. Through faith, doors opened miraculously.`;
+      lesson = "Take one small step of faith today – God honors those who trust Him.";
+    } else if (theme === "forgiveness") {
+      explanation = "Forgiveness is central to the gospel. We forgive because we have been forgiven an immeasurable debt.";
+      story = `${name} struggled to forgive a family betrayal. Meditating on this verse melted bitterness and restored relationships.`;
+      lesson = "Unforgiveness is a poison you drink hoping the other person dies. Release it into God's hands.";
+    } else if (theme === "wisdom") {
+      explanation = "Wisdom from above is pure, peaceable, and gentle. It guides us through complex decisions.";
+      story = `${name} faced a moral dilemma at work. Prayer and this verse brought clarity, saving them from a costly mistake.`;
+      lesson = "Ask God for wisdom daily – He gives generously without reproach.";
+    } else {
+      explanation = "This powerful scripture is alive and active. It speaks directly to your situation and builds faith.";
+      story = `${name} encountered this verse during ${situations[Math.floor(Math.random() * situations.length)]}. It became a turning point that led to unexpected blessings.`;
+      lesson = "Meditate on this verse for a week. Write it down and ask God to show you its personal application.";
+    }
+    return { explanation, story, lesson };
+  }
+
+  // render generated content into result card
+  function renderGeneratedContent(reference, verseText, explanation, story, lesson) {
+    const container = document.getElementById("generatedResultContainer");
+    const card = document.getElementById("generatedResultCard");
+    if (!container || !card) return;
+    card.innerHTML = `
+      <div class="verse-text">${escapeHtml(verseText)}</div>
+      <div style="text-align: right; margin-bottom: 1rem;"><span class="reference-badge">📖 ${escapeHtml(reference)}</span></div>
+      <div class="section"><h3>✨ Explanation</h3><p>${escapeHtml(explanation)}</p></div>
+      <div class="section"><h3>📖 Related Life Story</h3><p>${escapeHtml(story)}</p></div>
+      <div class="section"><h3>✝️ Christian Lesson</h3><p>${escapeHtml(lesson)}</p></div>
+    `;
+    container.style.display = "block";
+    window.scrollTo({ top: container.offsetTop - 20, behavior: "smooth" });
+  }
+
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+
+  // fetch from bible-api.com
+  async function fetchVerseFromAPI(reference) {
+    const encodedRef = encodeURIComponent(reference);
+    const url = `https://bible-api.com/${encodedRef}?translation=kjv`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Network error");
+    const data = await response.json();
+    if (data.error) throw new Error(data.error || "Verse not found");
+    if (!data.text) throw new Error("No verse text returned");
+    return { verse: data.text, reference: data.reference || reference };
+  }
+
+  // main action: fetch and generate
+  async function handleFetchAndGenerate() {
+    const refInput = document.getElementById("bibleRefInput").value.trim();
+    if (!refInput) { showError("Please enter a Bible reference (e.g., John 3:16)."); return; }
+    const loader = document.getElementById("fetchLoader");
+    const errorDiv = document.getElementById("fetchError");
+    errorDiv.style.display = "none";
+    loader.style.display = "flex";
+    try {
+      const { verse, reference } = await fetchVerseFromAPI(refInput);
+      const { explanation, story, lesson } = generateFromVerse(reference, verse);
+      renderGeneratedContent(reference, verse, explanation, story, lesson);
+    } catch (err) {
+      showError(`Could not fetch verse: ${err.message}. Try a different reference or use manual entry.`);
+    } finally {
+      loader.style.display = "none";
+    }
+  }
+
+  function showError(msg) {
+    const errorDiv = document.getElementById("fetchError");
+    errorDiv.innerText = msg;
+    errorDiv.style.display = "block";
+    setTimeout(() => { errorDiv.style.display = "none"; }, 5000);
+  }
+
+  // manual generate from textarea
+  function handleManualGenerate() {
+    const refInput = document.getElementById("bibleRefInput").value.trim();
+    const verseText = document.getElementById("manualVerseText").value.trim();
+    if (!verseText) { alert("Please type the verse text in the manual area."); return; }
+    const finalRef = refInput || "Your scripture";
+    const { explanation, story, lesson } = generateFromVerse(finalRef, verseText);
+    renderGeneratedContent(finalRef, verseText, explanation, story, lesson);
+  }
+
+  // random verse from built-in 28
+  function getRandomVerse() { return bibleData[Math.floor(Math.random() * bibleData.length)]; }
+  function renderRandomVerse(data) {
+    const container = document.getElementById("randomVerseContent");
+    if (!container) return;
+    container.innerHTML = `
+      <div class="verse-text">${data.verse}</div>
+      <div style="text-align: right; margin-bottom: 0.5rem;"><span class="reference-badge">📖 ${data.ref}</span></div>
+      <div class="section"><h3>✨ Explanation</h3><p>${data.explanation}</p></div>
+      <div class="section"><h3>📖 Related Life Story</h3><p>${data.story}</p></div>
+      <div class="section"><h3>✝️ Christian Lesson</h3><p>${data.lesson}</p></div>
+    `;
+  }
+  function loadRandomVerse() { renderRandomVerse(getRandomVerse()); }
+
+  // toggle manual area
+  function toggleManualArea() {
+    const area = document.getElementById("manualVerseArea");
+    if (area.style.display === "none") {
+      area.style.display = "block";
+      document.getElementById("showManualToggle").innerText = "⬅️ Hide manual entry";
+    } else {
+      area.style.display = "none";
+      document.getElementById("showManualToggle").innerText = "✍️ Or type verse manually";
+    }
+  }
+
+  // M-Pesa copy
+  function setupMpesaCopy() {
+    const copyBtn = document.getElementById("copyMpesaBtn");
+    const numberSpan = document.getElementById("mpesaNumberDisplay");
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(numberSpan.innerText).then(() => {
+        copyBtn.innerText = "✓ Copied!";
+        setTimeout(() => { copyBtn.innerText = "Copy"; }, 1500);
+      }).catch(() => alert("Please copy manually: " + numberSpan.innerText));
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadRandomVerse();
+    document.getElementById("refreshRandomBtn").addEventListener("click", loadRandomVerse);
+    document.getElementById("fetchVerseBtn").addEventListener("click", handleFetchAndGenerate);
+    document.getElementById("manualGenerateBtn").addEventListener("click", handleManualGenerate);
+    document.getElementById("showManualToggle").addEventListener("click", toggleManualArea);
+    setupMpesaCopy();
+  });
+</script>
+</body>
+</html>
